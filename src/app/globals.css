@@ -1,0 +1,167 @@
+/*
+ * Token-only layout wrappers (design.md §7). Never targets design-system component classes,
+ * never hardcodes colours, spacing, radii or font sizes.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: var(--space-8);
+  padding: var(--space-9);
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--layout-page-header-action-gap);
+}
+
+.page-header__titles {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.page-header__account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+  color: var(--color-text-secondary);
+  font-size: var(--typography-body-sm-fontSize);
+}
+
+.page-title {
+  margin: 0;
+  font-size: var(--typography-heading-h2-fontSize);
+  line-height: var(--typography-heading-h2-lineHeight);
+}
+
+.section-title {
+  margin: 0;
+  font-size: var(--typography-heading-h3-fontSize);
+  line-height: var(--typography-heading-h3-lineHeight);
+}
+
+/* Semantic heading inside lp-card__title: keeps the card's own title typography. */
+.heading-reset {
+  margin: 0;
+  font: inherit;
+}
+
+.page-intro {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--typography-body-md-fontSize);
+  line-height: var(--typography-body-md-lineHeight);
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.stack--tight {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--layout-dashboard-card-gap);
+}
+
+.kpi-value {
+  display: block;
+  font-size: var(--typography-heading-h1-fontSize);
+  line-height: var(--typography-heading-h1-lineHeight);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.toolbar__spacer {
+  flex: 1;
+}
+
+.inline-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--typography-body-sm-fontSize);
+}
+
+.muted {
+  color: var(--color-text-secondary);
+  font-size: var(--typography-body-sm-fontSize);
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-9);
+}
+
+.auth-page__panel {
+  width: 100%;
+  max-width: 28rem;
+  display: grid;
+  gap: var(--space-8);
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  font-size: var(--typography-heading-h3-fontSize);
+  line-height: var(--typography-heading-h3-lineHeight);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.form-stack {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.visually-hidden {
+  position: absolute;
+  clip: rect(0 0 0 0);
+}

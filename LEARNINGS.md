@@ -1,0 +1,10 @@
+# What I learned
+
+After each phase, the Agent asks the developer for one useful learning and records it briefly.
+
+- **Planning:** (Phase 0, agent-observed) Read the framework's bundled docs (`node_modules/next/dist/docs`) before coding — Next 16 renamed middleware → proxy and generates `LayoutProps`/`PageProps` types, so `tsc --noEmit` alone fails on a fresh clone. *Developer learning: pending — please add one.*
+- **Detection:** (Phase 1, agent-observed) Make detectors return spans + masks only, so the "no raw values" rule is enforced by the type, not by discipline. When a test fails, first decide whether the *test's* assumption matches the spec (e.g. optional NINO suffix) before changing detector code. *Developer learning: pending.*
+- **Security/persistence:** (Phase 2, agent-observed) Verify external setup with a cheap probe (anon REST call, env key names) instead of trusting a checkbox — here it showed the migration wasn't visible to the API. Framework defaults can silently weaken limits (Next proxy truncates bodies >10 MB), so enforce size limits in the handler itself. *Developer learning: pending.*
+- **UI:** (Phase 3, agent-observed) Read the design system's JS before wiring it into React: `lepidus.js` initialises each element once (`data-lp-ready`), so client-mounted markup needs `Lepidus.initDropdown(el)` and a `key` remount. A tiny script that checks every `lp-*` class against the documented legal sets catches drift faster than eyeballing. *Developer learning: pending.*
+- **Testing/deployment:** (Phase 0) Behind a TLS-intercepting proxy, `NODE_OPTIONS=--use-system-ca` fixes npm without disabling certificate checks; never use `strict-ssl=false` / `NODE_TLS_REJECT_UNAUTHORIZED=0`. (Phase 4) When the authenticated E2E path is blocked, still ship the E2E tests that *can* run (unauthenticated redirects, 401s, design-system script loaded) and make the blocked ones skip loudly with a reason — "3 passed, 2 skipped" is honest evidence, "5 passed" would not be.
+- **What I'd do differently:**
