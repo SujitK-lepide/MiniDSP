@@ -8,7 +8,7 @@ import type { ScanResult } from '@/components/scan-result';
 import { Spinner } from '@/components/spinner';
 import { maxRisk } from '@/lib/detectors/classify';
 import { DETECTOR_LABELS, formatCount } from '@/lib/ui/labels';
-import { FOLDER_MAX_FILES, planFolderScan, type FolderEntry, type SkippedEntry } from '@/lib/upload/folder';
+import { FOLDER_MAX_FILES, planFolderScan, relativePath, type FolderEntry, type SkippedEntry } from '@/lib/upload/folder';
 
 type Outcome =
   | { path: string; status: 'scanned'; result: ScanResult }
@@ -25,12 +25,18 @@ export function FolderScan() {
   const [outcomes, setOutcomes] = useState<Outcome[]>([]);
   const [phase, setPhase] = useState<Phase>('idle');
   const [fatal, setFatal] = useState<string | null>(null);
+  const [folderName, setFolderName] = useState<string | null>(null);
+  const [fileCount, setFileCount] = useState(0);
   const stopRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const scanning = phase === 'scanning';
 
   const onFolderChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const plan = planFolderScan(Array.from(e.target.files ?? []));
+    const files = Array.from(e.target.files ?? []);
+    const plan = planFolderScan(files);
+    setFolderName(files.length > 0 ? relativePath(files[0]).split('/')[0] : null);
+    setFileCount(files.length);
     setToScan(plan.toScan);
     setSkipped(plan.skipped);
     setOutcomes([]);
@@ -85,30 +91,43 @@ export function FolderScan() {
         </div>
       </div>
       <div className="lp-card__body stack--tight">
-        <div className="lp-input lp-input--full-width">
-          <div className="lp-input__row lp-input__row--label-top">
-            <label className="lp-input__label" htmlFor="upload-folder">
-              Folder
-            </label>
-            <div className="lp-input__field">
-              <input
-                className="lp-input__input"
-                id="upload-folder"
-                name="folder"
-                type="file"
-                multiple
-                {...{ webkitdirectory: '', directory: '' }}
-                onChange={onFolderChange}
-                aria-describedby="upload-folder-msg"
-                disabled={scanning}
-              />
-            </div>
-          </div>
-          <div id="upload-folder-msg" className="lp-input__message">
-            Every .csv and .txt file in the folder and its subfolders is scanned separately (up to {FOLDER_MAX_FILES} files,
-            1 MiB each). Other files are skipped. Only file contents are uploaded, never the folder itself.
-          </div>
+        {/* The native picker's "Choose Files" text can't be relabelled, so it is hidden and opened by a real button. */}
+        <input
+          ref={inputRef}
+          className="visually-hidden"
+          id="upload-folder"
+          name="folder"
+          type="file"
+          multiple
+          {...{ webkitdirectory: '', directory: '' }}
+          onChange={onFolderChange}
+          aria-label="Folder"
+          tabIndex={-1}
+          disabled={scanning}
+        />
+        <div className="form-actions">
+          <button
+            type="button"
+            className="lp-button lp-button--secondary lp-button--md"
+            onClick={() => inputRef.current?.click()}
+            disabled={scanning}
+            aria-describedby="upload-folder-msg"
+          >
+            <span className="lp-button__icon-left">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M1.5 4.5v8h13v-6.5H7.5L6 4.5Z" />
+              </svg>
+            </span>
+            Select folder
+          </button>
+          <span className="muted" data-testid="folder-name">
+            {folderName ? `${folderName} (${formatCount(fileCount)} ${fileCount === 1 ? 'file' : 'files'})` : 'No folder selected'}
+          </span>
         </div>
+        <p id="upload-folder-msg" className="muted">
+          Every .csv and .txt file in the folder and its subfolders is scanned separately (up to {FOLDER_MAX_FILES} files, 1 MiB
+          each). Other files are skipped. Only file contents are uploaded, never the folder itself.
+        </p>
 
         {toScan.length + skipped.length > 0 ? (
           <p className="muted" role="status">

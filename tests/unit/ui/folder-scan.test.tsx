@@ -40,6 +40,22 @@ describe('planFolderScan', () => {
 });
 
 describe('FolderScan', () => {
+  it('offers a "Select folder" button that opens the hidden folder picker and shows the chosen folder', async () => {
+    render(<FolderScan />);
+    const input = screen.getByLabelText('Folder') as HTMLInputElement;
+    expect(input).toHaveAttribute('webkitdirectory');
+    expect(input).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByTestId('folder-name')).toHaveTextContent('No folder selected');
+    expect(screen.queryByText(/Choose Files/i)).toBeNull();
+
+    const click = vi.spyOn(input, 'click');
+    await userEvent.click(screen.getByRole('button', { name: 'Select folder' }));
+    expect(click).toHaveBeenCalledOnce();
+
+    await userEvent.upload(input, [inFolder('Q3-exports/a.csv'), inFolder('Q3-exports/sub/b.txt'), inFolder('Q3-exports/c.png')]);
+    expect(screen.getByTestId('folder-name')).toHaveTextContent('Q3-exports (3 files)');
+  });
+
   it('uploads each supported file separately and summarises the results', async () => {
     const fetchMock = vi.fn(async (_url: string, init: RequestInit) => {
       const file = (init.body as FormData).get('file') as File;
